@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Data - Granblue GW Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a href="/">Dashboard</a><a href="/admin/events">Events</a><a href="/admin/nextevent">Next Event</a><a href="/admin/settings">Settings</a></div>
+        <h1>Wiki Data</h1>
+        <form method="post" action="/admin/wiki_data/load" style="display:inline">
+            <button type="submit">Load Wiki Data</button>
+        </form>
+        <form method="post" action="/admin/wiki_data/process" style="display:inline">
+            <button type="submit">Process Wiki Data</button>
+        </form>
+    </div>
+</body>
+</html>

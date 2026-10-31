@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Event - Granblue GW Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav"><a href="/">Dashboard</a><a href="/admin/events">Events</a></div>
+        <h1>Next Event</h1>
+        <form method="post" action="/admin/nextevent">
+            <p><label>Event number: <input type="number" name="event_number" value="{{ default_number }}"></label></p>
+            <p><label>Element advantage:
+                <select name="element">
+                    <option>fire</option><option>water</option><option>earth</option><option>wind</option><option>light</option><option>dark</option>
+                </select>
+            </label></p>
+            <p><label>Preliminaries_start (JST): <input type="datetime-local" name="Preliminaries_start" id="Preliminaries_start"></label></p>
+            {% for f in ["Preliminaries_end","Interlude_start","Interlude_end","Finals_1_start","Finals_1_end","Finals_2_start","Finals_2_end","Finals_3_start","Finals_3_end","Finals_4_start","Finals_4_end"] %}
+            <p><label>{{ f }} (JST): <input type="datetime-local" name="{{ f }}" id="{{ f }}"></label></p>
+            {% endfor %}
+            <button type="button" onclick="autofill()">Auto-fill from start</button>
+            <p><label>Notes:<br><textarea name="notes" rows="4" cols="60"></textarea></label></p>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+    <script>
+    const offsets = {{ intervals|tojson }};
+    function toLocal(dt){ const p=n=>String(n).padStart(2,'0'); return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate())+'T'+p(dt.getHours())+':'+p(dt.getMinutes()); }
+    function autofill(){
+      const start=document.getElementById('Preliminaries_start').value;
+      if(!start) return;
+      const base=new Date(start);
+      for(const k in offsets){
+        const d=new Date(base.getTime()+offsets[k]*1000);
+        document.getElementById(k).value=toLocal(d);
+      }
+    }
+    </script>
+</html>
+EOF
+echo done

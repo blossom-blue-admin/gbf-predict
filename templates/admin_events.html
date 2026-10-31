@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Info Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/admin/refresh">Refresh All</a>
+        </div>
+        
+        <h1>Event Info Management</h1>
+        
+        {% if detected %}
+        <div class="detected-info" style="margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+            <h3>Detected Timetable (from data):</h3>
+            {% for teamraidid, timetable in detected.items() %}
+            <p><strong>{{ teamraidid }}:</strong>
+                {% if timetable.event_start %}Event Start: {{ timetable.event_start }} | {% endif %}
+                {% if timetable.preliminary_end %}Prelim End: {{ timetable.preliminary_end }} | {% endif %}
+                {% if timetable.interlude_start %}Interlude Start: {{ timetable.interlude_start }} | {% endif %}
+                {% if timetable.interlude_end %}Interlude End: {{ timetable.interlude_end }} | {% endif %}
+                {% if timetable.final_rally_end %}Final Rally End: {{ timetable.final_rally_end }}{% endif %}
+            </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Teamraid ID</th>
+                    <th>Event Start</th>
+                    <th>Prelim End</th>
+                    <th>Interlude Start</th>
+                    <th>Interlude End</th>
+                    <th>Finals 1 Start</th>
+                    <th>Finals 1 End</th>
+                    <th>Finals 2 Start</th>
+                    <th>Finals 2 End</th>
+                    <th>Finals 3 Start</th>
+                    <th>Finals 3 End</th>
+                    <th>Finals 4 Start</th>
+                    <th>Finals 4 End</th>
+                    <th>Prelim Dur</th>
+                    <th>Interlude Dur</th>
+                    <th>F1 Dur</th>
+                    <th>F2 Dur</th>
+                    <th>F3 Dur</th>
+                    <th>F4 Dur</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event['teamraidid'] }}</td>
+                    <td>
+                        <form method="POST" action="/admin/events/update/{{ event['teamraidid'] }}">
+                            <input type="number" name="event_start" value="{{ event['event_start'] or '' }}" placeholder="Unix timestamp">
+                    </td>
+                    <td><input type="number" name="preliminary_end" value="{{ event['preliminary_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="interlude_start" value="{{ event['interlude_start'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="interlude_end" value="{{ event['interlude_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_1_start" value="{{ event['finals_1_start'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_1_end" value="{{ event['finals_1_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_2_start" value="{{ event['finals_2_start'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_2_end" value="{{ event['finals_2_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_3_start" value="{{ event['finals_3_start'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_3_end" value="{{ event['finals_3_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_4_start" value="{{ event['finals_4_start'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td><input type="number" name="finals_4_end" value="{{ event['finals_4_end'] or '' }}" placeholder="Unix timestamp"></td>
+                    <td>{{ event['preliminary_duration'] or '' }}</td>
+                    <td>{{ event['interlude_duration'] or '' }}</td>
+                    <td>{{ event['finals_1_duration'] or '' }}</td>
+                    <td>{{ event['finals_2_duration'] or '' }}</td>
+                    <td>{{ event['finals_3_duration'] or '' }}</td>
+                    <td>{{ event['finals_4_duration'] or '' }}</td>
+                    <td><button type="submit">Save</button></td>
+                    </form>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="20" style="text-align: center; color: #94a3b8;">No event info found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

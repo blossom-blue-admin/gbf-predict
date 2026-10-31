@@ -1,0 +1,5 @@
+api_cache/
+*.db
+*.pyc
+debug_log.txt
+debug_response.txt

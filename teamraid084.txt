@@ -1,0 +1,12 @@
+Preliminaries_start 1789984800 
+Preliminaries_end 1790089140
+Interlude_start 1790114400 
+Interlude_end 1790197140
+Finals_1_start 1790200800 
+Finals_1_end 1790261940
+Finals_2_start 1790287200 
+Finals_2_end 1790348340
+Finals_3_start 1790373600 
+Finals_3_end 1790434740
+Finals_4_start 1790456400 
+Finals_4_end 1790521140

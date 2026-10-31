@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Granblue GW Tracker Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Guild War Tracking Logs</h1>
+        <div class="status-badge">● Engine Active: Syncing every 5 minutes</div>
+        
+        <div class="variations">
+            <label>Type:</label>
+            <select id="typeSelect" onchange="updateRanks()">
+                {% for type_label in config.get("type", {}).keys() %}
+                <option value="{{ type_label }}">{{ type_label }}</option>
+                {% endfor %}
+            </select>
+            <label>Variation:</label>
+            <select id="eventSelect">
+                {% for label in config.get("teamraidid", {}).keys() %}
+                <option value="{{ label }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            <label>Rank:</label>
+            <select id="rankSelect">
+                {% for rank_label, rank_value in config.get("type", {}).get("user", {}).items() %}
+                <option value="{{ rank_value }}">{{ rank_label }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="loadVariation()">Load Data</button>
+            <a href="/admin/refresh" style="text-decoration: none;"><button type="button" style="background-color: #10b981; margin-left: 10px;">Refresh All</button></a>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="cutoffChart"></canvas>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Teamraid ID</th>
+                    <th>Type</th>
+                    <th>Rank</th>
+                    <th>Update Time</th>
+                    <th>Point</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                <tr>
+                    <td>{{ row['teamraidid'] }}</td>
+                    <td>{{ row['type'] }}</td>
+                    <td>{{ row['rank'] }}</td>
+                    <td>{{ row['updatetime'] }}</td>
+                    <td>{{ "{:,}".format(row['point']) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #94a3b8;">No records captured yet. Waiting for first scheduled event loop cycle...</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('cutoffChart').getContext('2d');
+        
+        // Chart data from Flask (most recent API response)
+        const chartData = {{ series_list | tojson }};
+        const first = chartData.length ? chartData[0] : {data: []};
+        const labels = first.data.map(r => r.time);
+        const data = first.data.map(r => r.point);
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Cutoff Points (Rank 300)',
+                    data: data,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                label += new Intl.NumberFormat('en-US').format(context.parsed.y);
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time (UTC)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Cutoff Points'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('en-US').format(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateRanks() {
+            const typeSelect = document.getElementById('typeSelect');
+            const rankSelect = document.getElementById('rankSelect');
+            const selectedType = typeSelect.value;
+            
+            // Clear current options
+            rankSelect.innerHTML = '';
+            
+            // Add new options based on selected type
+            const config = {{ config | tojson }};
+            const ranks = config.type[selectedType] || {};
+            for (const [label, value] of Object.entries(ranks)) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                rankSelect.appendChild(option);
+            }
+        }
+
+        function loadVariation() {
+            const eventLabel = document.getElementById('eventSelect').value;
+            const typeValue = document.getElementById('typeSelect').value;
+            const rankValue = document.getElementById('rankSelect').value;
+            window.location.href = `/fetch/${encodeURIComponent(eventLabel)}/${typeValue}/${rankValue}`;
+        }
+    </script>
+</body>
+</html>

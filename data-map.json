@@ -1,0 +1,25 @@
+{
+    "teamraidid": {
+        "79 (Dark advantage)": "teamraid079",
+        "80 (Wind advantage)": "teamraid080",
+        "81 (Earth advantage)": "teamraid081",
+        "82 (Water advantage)": "teamraid082",
+        "83 (Fire advantage)": "teamraid083",
+        "84 (Light advantage)": "teamraid084"
+    },
+    "type": {
+        "guild": {
+            "Top 300": "300",
+            "Top 2,500": "2500",
+            "Top 5,500": "5500",
+            "Top 9,000": "9000",
+            "Top 14,000": "14000"
+        },
+        "user": {
+            "Top 1":"1",
+            "Top 2,000": "2000",
+            "Tier 1": "100000",
+            "Tier 2": "150000"
+        }
+    }
+}
